@@ -29,6 +29,47 @@ Solar PV systems in Palestine face four compounding problems that this project a
 
 ---
 
+## 🔍 How Solar Guardian Differs from Related Work
+
+Most prior solar panel monitoring systems that have been developed focus on a **single, narrow concern** and solve it in isolation. Solar Guardian was designed from the ground up to be a fundamentally different class of system. The key distinguishing points are:
+
+### 1. Electrical Intelligence vs. Visual Inspection
+Many existing systems rely on a **camera and computer-vision model** (e.g., image classification or object detection) to observe the panel surface and infer whether it is dirty. Solar Guardian takes the opposite approach: it uses **no camera at all**. Instead, it reads the panel's live electrical output (voltage and current) and compares it against a physics-based expected value computed from the current environmental conditions (irradiance and temperature). This means faults are detected from *what the panel is actually doing electrically*, not from how it looks — making the diagnosis more directly tied to real energy loss.
+
+### 2. Fault Classification, Not Just Contamination Detection
+Prior work in this space typically answers one binary question: *"Is the panel dirty?"* Solar Guardian answers a richer question: *"What kind of fault is present, how severe is it, and what should the user do?"* It classifies five distinct fault modes — Partial Shading, Dust & Soiling, Open Circuit, Short Circuit, and Long-Term Degradation — each with a **severity level**, a **confidence score**, and a plain-language **remediation recommendation**.
+
+### 3. Three Integrated Subsystems in One Platform
+Existing projects are almost always single-purpose: a cleaning robot, a monitoring dashboard, or an MPPT tracker — each built as a standalone system. Solar Guardian integrates three fully operational subsystems into a **single embedded platform running on one ESP32**:
+- AI-based fault detection and classification
+- Automatic sun tracking via LDR differential sensing
+- Electricity consumption monitoring and bill estimation
+
+No prior work reviewed combines all three in a unified, low-cost embedded design.
+
+### 4. Actionable Economic Output
+Most monitoring systems stop at raw sensor data or fault alerts. Solar Guardian goes further by calculating the **estimated electricity bill** from the grid draw, giving users a direct financial view of their system's performance — a feature absent from purely technical monitoring or cleaning-focused systems.
+
+### 5. Dual Expected-Power Validation
+To make fault confidence more robust, Solar Guardian computes the expected panel output using **two independent methods simultaneously**: a real-time physics model (temperature coefficient + irradiance ratio + angle loss + dust factor) and an **on-device AI Time-Series Transformer** trained on the rolling session history. A fault is flagged with higher confidence only when both models agree — significantly reducing false positives compared to single-threshold systems.
+
+### 6. No Mechanical Cleaning — Inform and Track Instead
+Systems that attach a brush and water pump to physically clean the panel introduce mechanical complexity, water consumption, and maintenance overhead. Solar Guardian's philosophy is different: **detect the fault precisely, quantify the loss, and inform the user with a clear recommendation** — then let the user decide when and how to act. The only motor in the system is the sun-tracking servo, which directly increases energy yield rather than reacting to contamination after the fact.
+
+### Summary Table
+
+| Aspect | Typical Prior Approaches | Solar Guardian |
+|--------|--------------------------|----------------|
+| Fault detection method | Camera + image/CV model | Electrical parameter deviation from physics model |
+| Output | "Panel is dirty / clean" | Fault type, severity, confidence, recommendation |
+| Subsystems covered | Single (cleaning OR monitoring OR tracking) | Three (fault detection + sun tracking + billing) |
+| Economic output | None | Estimated electricity bill in ILS |
+| Expected-power validation | Single threshold or none | Dual: physics model + AI Transformer |
+| Hardware complexity | Camera, motor, water pump, Raspberry Pi | Electrical sensors only, single ESP32 |
+| Water / mechanical usage | Yes (cleaning systems) | None |
+
+---
+
 ## 🏗️ System Architecture
 
 ```
